@@ -1,251 +1,988 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
-@theme inline {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+/* A phone held sideways: too short for the menu as a single column. */
+@custom-variant short (@media (max-height: 30rem));
 
-  /* The illustration palette: a sunrise over the bay, printed on warm paper. */
-  --color-paper: #f7f0e3;
-  --color-cream: #fff8ec;
-  --color-peach: #fbddbd;
-  --color-apricot: #f5b98c;
-  --color-coral: #ee7a52;
-  --color-kapok: #c93f23;
-  --color-gold: #f0b955;
-  --color-mist: #d8e8dd;
-  --color-sage: #a9c9ba;
-  --color-moss: #72a696;
-  --color-jade: #3f8172;
-  --color-pine: #1f5248;
-  --color-ink: #12302b;
+@theme inline {
+  /* Each var() carries a fallback: without one, a missing font stylesheet would void the whole declaration. */
+  --font-sans: var(--font-geist, ui-sans-serif), system-ui, sans-serif;
+  --font-display: var(--font-cormorant, "Cormorant Garamond"), ui-serif, Georgia, serif;
+
+  /* A quiet palette: ivory paper, near-black ink, one line of bronze. Red appears only in the logo. */
+  --color-ivory: #f3eee4;
+  --color-ink: #0f1513;
+  --color-stone: #5f645c;
+  --color-bronze: #b08d57;
+  --color-kapok: #c2402a;
+  --color-line: rgb(15 21 19 / 0.14);
 }
 
-/*
- * Brand theme on top of the HeroUI defaults: kapok red for actions,
- * deep pine ink for text, and warm paper instead of white and grey.
- */
+/* HeroUI theme: the same palette, with square corners and hairlines instead of soft shadows. */
 :root {
-  --accent: #c93f23;
-  --accent-foreground: #fff8ec;
-  --background: #f7f0e3;
-  --foreground: #12302b;
-  --surface: #fffbf4;
-  --surface-secondary: #f1e8d8;
-  --surface-tertiary: #eadfcb;
-  --overlay: #fffbf4;
-  --default: #efe6d6;
-  --default-foreground: #12302b;
-  --field-background: #fffbf4;
-  --field-foreground: #12302b;
-  --segment: #fffbf4;
-  --segment-foreground: #12302b;
-  --muted: #54695f;
-  --border: #e2d7c3;
-  --separator: #e6dcca;
-  --success: #3f8172;
-  --success-foreground: #fff8ec;
+  /* Zero keeps its unit: the library multiplies it inside calc(). */
+  --radius: 0rem;
+  --field-radius: 0rem;
+  --accent: #0f1513;
+  --accent-foreground: #f3eee4;
+  --background: #f3eee4;
+  --foreground: #0f1513;
+  --surface: #faf7f0;
+  --surface-secondary: #ebe5d8;
+  --surface-tertiary: #e2dbcc;
+  --overlay: #faf7f0;
+  --default: #e8e1d2;
+  --default-foreground: #0f1513;
+  --field-background: #faf7f0;
+  --field-foreground: #0f1513;
+  --segment: #faf7f0;
+  --segment-foreground: #0f1513;
+  --muted: #5f645c;
+  --border: rgb(15 21 19 / 0.14);
+  --separator: rgb(15 21 19 / 0.14);
+  --success: #3f6f5f;
+  --success-foreground: #f3eee4;
+  /* The flower's red, darkened until it reads as ink. */
+  --danger: #9a3320;
+  --danger-foreground: #f3eee4;
+  --focus: #8a6b3d;
+  --surface-shadow: 0 0 0 1px rgb(15 21 19 / 0.1);
+  --field-shadow: 0 0 0 1px rgb(15 21 19 / 0.12);
+  --overlay-shadow: 0 0 0 1px rgb(15 21 19 / 0.14);
+
+  --header: 4.5rem;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* For things that draw or unveil: a slow start, then a long settle. */
+  --ease-draw: cubic-bezier(0.7, 0, 0.2, 1);
+  /* Every transition utility, the library's included, moves on the house curve. */
+  --default-transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 html {
+  /* Above 1600px the whole composition grows with the screen; below it nothing changes. */
+  font-size: clamp(100%, 0.5rem + 0.5vw, 137.5%);
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  scroll-padding-top: calc(var(--header) + 1rem);
 }
 
 ::selection {
-  background: #f5b98c;
-  color: #12302b;
+  background: #b08d57;
+  color: #f3eee4;
 }
 
-h1,
-h2,
-h3 {
-  text-wrap: balance;
-}
+@layer base {
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
-}
+  p,
+  li,
+  dt,
+  dd {
+    text-wrap: pretty;
+  }
 
-/* ---------- Surfaces ---------- */
-
-/* The hero's sky. The landscape is drawn on top of it with no sky of its own. */
-.sky {
-  background: linear-gradient(180deg, #f7f0e3 0%, #fbe7cd 34%, #f9d2ac 68%, #f4b68d 100%);
-}
-
-.sky-soft {
-  background: linear-gradient(180deg, #f7f0e3 0%, #fbe7cd 60%, #f9d9b8 100%);
-}
-
-/* Lets a section's artwork run up underneath the floating header. */
-.under-header {
-  margin-top: -4.25rem;
-  padding-top: 4.25rem;
-}
-
-/* Paper grain over the artwork. */
-.grain::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.15  0 0 0 0 0.1  .55 0 0 0 -.14'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-/* Fades the grain out at the bottom, where a band dissolves into the plain page. */
-.grain-fade::after {
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 8rem), transparent calc(100% - 2rem));
-}
-
-/* Artwork is absolutely placed and sits under the grain; content is lifted with z-10. */
-.art {
-  position: absolute;
-  pointer-events: none;
-}
-
-/* The itinerary, cut like a boarding pass. */
-.ticket-shadow {
-  filter: drop-shadow(0 24px 32px rgb(18 48 43 / 0.16)) drop-shadow(0 2px 4px rgb(18 48 43 / 0.1));
-}
-
-.ticket {
-  border-radius: 1.75rem;
-  overflow: hidden;
-}
-
-@media (min-width: 48rem) {
-  .ticket {
-    mask-image:
-      radial-gradient(circle 12px at 15rem 0, transparent 11.5px, black 12px),
-      radial-gradient(circle 12px at 15rem 100%, transparent 11.5px, black 12px);
-    mask-composite: intersect;
+  /* In the base layer so a positioning utility on a photograph still wins. */
+  img.photo {
+    position: relative;
+    color: transparent;
   }
 }
 
-/* The fee summary, torn off like a till receipt. */
-.receipt {
-  --tooth: 9px;
-  padding-bottom: calc(var(--tooth) + 1.75rem);
-  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(2 * var(--tooth)) 100%;
+/* ---------- Type ---------- */
+
+/*
+ * Display serif. The house rule, by size:
+ *   60px and up   leading 0.98, tracking -0.022em
+ *   48px          leading 1.02, tracking -0.018em
+ *   30 to 36px    leading 1.06, tracking -0.012em
+ *   26 to 28px    leading 1.1, tracking -0.01em, weight 500
+ * No Cormorant below 26px.
+ *
+ * These live in the components layer so leading-*, tracking-* and font-* utilities can tune them.
+ * --tw-leading keeps the house leading under a named size (text-4xl reads it) until a leading-* utility is added.
+ */
+@layer components {
+  .display {
+    font-family: var(--font-cormorant, "Cormorant Garamond"), ui-serif, Georgia, serif;
+    font-weight: 400;
+    --tw-leading: 0.98;
+    line-height: 0.98;
+    letter-spacing: -0.022em;
+    font-variant-numeric: lining-nums;
+  }
+
+  .display em {
+    font-style: italic;
+    letter-spacing: -0.012em;
+  }
+
+  /* The italic ampersand is the handsomest glyph in the family; display titles borrow it. */
+  .display .amp {
+    font-style: italic;
+  }
+
+  /* A sentence set in the serif: the one statement an inner page makes. */
+  .statement {
+    font-size: clamp(1.625rem, 1.1rem + 1.5vw, 2.25rem);
+    --tw-leading: 1.16;
+    line-height: 1.16;
+    letter-spacing: -0.015em;
+  }
+
+  /* The small voice: labels above headings, table keys, dates. Shared with the nav and the buttons. */
+  .eyebrow {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.04em;
+  }
 }
 
-.barcode {
-  height: 2.25rem;
-  background: repeating-linear-gradient(
-    90deg,
-    currentColor 0 2px,
-    transparent 2px 5px,
-    currentColor 5px 6px,
-    transparent 6px 10px,
-    currentColor 10px 13px,
-    transparent 13px 15px
-  );
+.vertical {
+  writing-mode: vertical-rl;
+}
+
+/* Chinese in a Song serif where the system has one, to sit beside Cormorant; otherwise the system sans. */
+.zh {
+  font-family: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", sans-serif;
+}
+
+/* ---------- Links ---------- */
+
+/* A hairline under a link that draws in from the left on hover and on keyboard focus. */
+.link-line {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 0.25rem;
+  transition: background-size 0.6s var(--ease);
+}
+
+.link-line[aria-current="page"],
+.link-line:focus-visible,
+a:focus-visible .link-line {
+  background-size: 100% 1px;
+}
+
+@media (hover: hover) {
+  .link-line:hover,
+  .group:hover .link-line {
+    background-size: 100% 1px;
+  }
+}
+
+/* Always underlined; on hover the line leaves to the right and returns from the left. */
+.link-under,
+.legal a {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+  padding-bottom: 0.25rem;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  @keyframes redraw {
+    0% {
+      background-position: 100% 100%;
+      background-size: 100% 1px;
+    }
+    45% {
+      background-position: 100% 100%;
+      background-size: 0 1px;
+    }
+    45.01% {
+      background-position: 0 100%;
+      background-size: 0 1px;
+    }
+    100% {
+      background-position: 0 100%;
+      background-size: 100% 1px;
+    }
+  }
+
+  .link-under:hover,
+  .group:hover .link-under,
+  .legal a:hover {
+    animation: redraw 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+}
+
+/*
+ * One focus mark for the site's own links: a square hairline in the text colour.
+ * Buttons carry it inside the fill, where it shows on paper and on photographs.
+ * Form fields and the checkbox keep the bronze.
+ */
+a:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 6px;
+}
+
+/* The site's own buttons, links or not, take the hairline in place of the library's ring. */
+.btn:focus-visible,
+.btn[data-focus-visible="true"],
+header .button[data-focus-visible="true"],
+.drawer__close-trigger[data-focus-visible="true"] {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  outline: 1px solid currentColor;
+  outline-offset: 0;
+}
+
+.btn:focus-visible,
+.btn[data-focus-visible="true"] {
+  outline-offset: -6px;
+}
+
+/* ---------- Buttons ---------- */
+
+/* One object everywhere: a filled rectangle whose fill drains away on hover and leaves a hairline frame. */
+.btn {
+  border-width: 1px;
+  border-style: solid;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 100%;
+  background-origin: border-box;
+  transition:
+    background-size 0.6s var(--ease),
+    background-color 0.6s var(--ease),
+    color 0.6s var(--ease),
+    border-color 0.6s var(--ease),
+    scale 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+/* Links only: the HeroUI button already shrinks itself when pressed, with a transform. */
+a.btn:active {
+  scale: 0.98;
+}
+
+.btn-primary {
+  border-color: #0f1513;
+  background-color: transparent;
+  background-image: linear-gradient(#0f1513, #0f1513);
+  color: #f3eee4;
+}
+
+.btn-light {
+  border-color: #f3eee4;
+  background-color: transparent;
+  background-image: linear-gradient(#f3eee4, #f3eee4);
+  color: #0f1513;
+}
+
+/* The second button of a pair is the first one's mirror: a frame at rest that fills from the bottom on hover. */
+.btn-outline {
+  --fill: #0f1513;
+  --on-fill: #f3eee4;
+  border-color: color-mix(in srgb, var(--fill) 30%, transparent);
+  background-color: transparent;
+  background-image: linear-gradient(var(--fill), var(--fill));
+  background-size: 100% 0;
+  color: var(--fill);
+}
+
+.bg-ink .btn-outline {
+  --fill: #f3eee4;
+  --on-fill: #0f1513;
+}
+
+@media (hover: hover) {
+  .btn-primary:hover {
+    background-size: 100% 0;
+    color: #0f1513;
+  }
+
+  .btn-light:hover {
+    background-size: 100% 0;
+    color: #f3eee4;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--fill);
+    background-size: 100% 100%;
+    color: var(--on-fill);
+  }
+}
+
+/*
+ * The header's button changes with the bar under it, so it carries both fills and moves between them by size
+ * alone: drained to a frame over a photograph, filled with ink on paper. --hold is set by the bar while it leaves.
+ */
+.btn-header {
+  border-color: color-mix(in srgb, currentColor 50%, transparent);
+  background-image: linear-gradient(#0f1513, #0f1513), linear-gradient(#f3eee4, #f3eee4);
+  background-size:
+    100% 0,
+    100% 0;
+  transition-delay: var(--hold, 0s);
+}
+
+/* Stated once the script runs: a colour inherited from the bar would trail the bar's own transition. */
+:where(html[data-hydrated]) .btn-header {
+  color: #f3eee4;
+}
+
+.btn-header.on-paper {
+  border-color: #0f1513;
+  background-size:
+    100% 100%,
+    100% 0;
+  color: #f3eee4;
+}
+
+@media (hover: hover) {
+  .btn-header:hover {
+    border-color: #f3eee4;
+    background-size:
+      100% 0,
+      100% 100%;
+    color: #0f1513;
+  }
+
+  .btn-header.on-paper:hover {
+    border-color: #0f1513;
+    background-size:
+      100% 0,
+      100% 0;
+  }
+}
+
+/* On the inquiry page the button is the current place: a frame, like the nav's hairline. Stays after the hovers. */
+.btn-header.on-paper[aria-current="page"],
+.btn-header.on-paper[aria-current="page"]:hover {
+  background-size:
+    100% 0,
+    100% 0;
+  color: #0f1513;
+}
+
+/* ---------- Layout ---------- */
+
+/* The header is fixed; every page starts below it, except a section that opts to run underneath. */
+main {
+  padding-top: var(--header);
+}
+
+.under-header {
+  margin-top: calc(var(--header) * -1);
+}
+
+/* Before the script arrives, the scroll position alone turns the header over a photograph to paper. */
+@supports (animation-timeline: scroll()) {
+  @keyframes header-to-paper {
+    to {
+      border-bottom-color: rgb(15 21 19 / 0.14);
+      background-color: #f3eee4;
+      color: #0f1513;
+    }
+  }
+
+  /* The bar's button goes with it: a frame over the photograph, filled with ink on paper. */
+  @keyframes header-button-to-paper {
+    to {
+      border-color: #0f1513;
+      background-size:
+        100% 100%,
+        100% 0;
+      color: #f3eee4;
+    }
+  }
+
+  html:not([data-hydrated]) header[data-over-photo] {
+    animation: header-to-paper linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 1.5rem;
+  }
+
+  html:not([data-hydrated]) header[data-over-photo] .btn-header {
+    animation: header-button-to-paper linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 1.5rem;
+  }
+}
+
+/* A hairline that can draw itself. The transparent border keeps the line in forced-colours mode. */
+.rule {
+  border-top: 1px solid transparent;
+  background: linear-gradient(var(--rule, rgb(15 21 19 / 0.14)), var(--rule, rgb(15 21 19 / 0.14))) 0 0 / 100% 1px
+    no-repeat border-box;
+}
+
+/* ---------- Photographs ---------- */
+
+/* One grade for every photograph: colour pulled back here, then printed on the paper below so no white is brighter than the page. */
+.grade {
+  filter: saturate(0.7) contrast(1.05);
+}
+
+/*
+ * The paper a photograph is printed on: the page colour a step darker, so a white edge of a picture still reads
+ * against the page. Until the file arrives the frame shows --photo-ground through the paper; white, the default,
+ * leaves the bare paper tone.
+ */
+.plate {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--photo-ground, #fff);
+}
+
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ede8de;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* The closing picture: dusk kept, a little quieter and a stop darker, so the page ends as it began. */
+.grade-night {
+  filter: saturate(0.7) contrast(1.05) brightness(0.9);
+}
+
+/* The hero picture: keep the tower's spire clear of the header as the window gets wider and shorter. */
+@media (min-width: 40rem) and (min-aspect-ratio: 7/4), (min-width: 110rem) {
+  .hero-photo {
+    object-position: 50% 70%;
+  }
+}
+@media (min-width: 40rem) and (min-aspect-ratio: 2/1) {
+  .hero-photo {
+    object-position: 50% 55%;
+  }
+}
+@media (min-width: 40rem) and (min-aspect-ratio: 5/2) {
+  .hero-photo {
+    object-position: 50% 40%;
+  }
+}
+
+/* A picture that never arrives leaves its ground and its description, not a broken-image icon. */
+img.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--photo-ground, #e8e1d2);
+}
+
+.plate img.photo::after {
+  background-color: var(--photo-ground, #fff);
+}
+
+img.photo:not([alt=""])::before {
+  content: attr(alt);
+  position: absolute;
+  z-index: 1;
+  inset: auto 1.5rem 1.25rem;
+  font:
+    0.8125rem/1.25rem var(--font-geist, ui-sans-serif),
+    system-ui,
+    sans-serif;
+  letter-spacing: 0.04em;
+  color: var(--photo-caption, #5f645c);
+}
+
+/* ---------- Inquiry form ---------- */
+
+/*
+ * Each field is a label, a line of type and a rule: no boxes, no fills. These rules are unlayered, so they hold
+ * in every state of the HeroUI controls. They never set box-shadow, which the library uses to cover the browser's
+ * autofill colour.
+ */
+.inquiry .input,
+.inquiry .textarea,
+.inquiry .select__trigger {
+  /* The paper colour, so the autofill cover matches the page. */
+  --input-bg: #f3eee4;
+  --textarea-bg: #f3eee4;
+  /* No focus ring: the rule itself answers. */
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+  min-height: 3rem;
+  padding: 0.625rem 0;
+  border-width: 0 0 1px;
+  border-style: solid;
+  /* Half ink: 3.4 to 1 on the paper, enough for the one line that marks a field. */
+  border-color: rgb(15 21 19 / 0.5);
+  border-radius: 0;
+  outline: none;
+  background-color: #f3eee4;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+}
+
+.inquiry .textarea {
+  min-height: 7rem;
+  resize: none;
+  field-sizing: content;
+}
+
+.inquiry .select__trigger {
+  align-items: center;
+  padding-inline-end: 1.75rem;
+}
+
+.inquiry .select__value {
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
+}
+
+.inquiry .select__indicator {
+  inset-inline-end: 0;
+  color: #0f1513;
+}
+
+@media (hover: hover) {
+  .inquiry .input:hover,
+  .inquiry .textarea:hover,
+  .inquiry .select__trigger:hover {
+    border-color: #0f1513;
+  }
+}
+
+.inquiry .input:focus,
+.inquiry .textarea:focus,
+.inquiry .select__trigger:focus-visible,
+.inquiry .select__trigger[data-focus-visible="true"],
+.inquiry .select__trigger[aria-expanded="true"] {
+  border-color: var(--focus);
+  border-bottom-width: 2px;
+  padding-bottom: calc(0.625rem - 1px);
+}
+
+.inquiry .input[data-invalid="true"],
+.inquiry .textarea[data-invalid="true"],
+.inquiry .select[data-invalid="true"] .select__trigger {
+  border-color: var(--danger);
+}
+
+/* Labels speak in the small voice (.eyebrow). Required fields carry no asterisk; the two optional ones say so. */
+.inquiry .label {
+  color: #5f645c;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.inquiry .label::after {
+  content: none;
+}
+
+.inquiry .description,
+.inquiry .field-error {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+.inquiry .textfield .field-error,
+.inquiry .select .field-error {
+  padding-inline: 0;
+}
+
+.inquiry .checkbox > .field-error {
+  color: var(--danger);
+}
+
+.inquiry .description a {
+  font-size: inherit;
+}
+
+.inquiry .checkbox__content {
+  font-weight: 400;
+}
+
+.inquiry .checkbox__control {
+  border: 1px solid rgb(15 21 19 / 0.55);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.inquiry .checkbox__control::before {
+  border-radius: 0;
+}
+
+.inquiry .checkbox:hover .checkbox__control,
+.inquiry .checkbox[data-selected="true"] .checkbox__control {
+  border-color: #0f1513;
+}
+
+.inquiry .checkbox[data-invalid="true"] .checkbox__control {
+  border-color: var(--danger);
+  outline: none;
+}
+
+/* The option list is portalled out of the form, so it is styled globally: square, on the overlay's hairline. */
+.select__popover {
+  border-radius: 0;
+}
+
+.select__popover [data-slot="list-box"] {
+  padding: 0.375rem 0;
+}
+
+.select__popover [data-slot="list-box-item"] {
+  min-height: 2.75rem;
+  border-radius: 0;
+  padding: 0.625rem 1rem;
+  font-size: 0.9375rem;
+}
+
+/* ---------- Questions ---------- */
+
+/* The marker is a hairline plus whose upright closes to a minus. An odd size keeps both strokes on whole pixels. */
+.faq-mark {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  color: #5f645c;
+}
+
+.faq-mark::before,
+.faq-mark::after {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 0.5px) 0 auto;
+  height: 1px;
+  background: currentColor;
+}
+
+.faq-mark::after {
+  rotate: 90deg;
+}
+
+/* HeroUI spins its indicator half a turn when open; this one stays put and only its upright moves. */
+.faq-mark[data-expanded="true"] {
+  rotate: none;
+  color: #0f1513;
+}
+
+.faq-mark[data-expanded="true"]::after {
+  rotate: 0deg;
+}
+
+@media (hover: hover) {
+  .accordion__trigger:hover .faq-mark {
+    color: #0f1513;
+  }
+}
+
+/*
+ * A question is a line of type, not a control. On keyboard focus it takes the links' hairline frame, drawn clear of
+ * the type and of the rules above and below, instead of the library's ring.
+ */
+.accordion__trigger {
+  position: relative;
+}
+
+.accordion__trigger[data-focus-visible="true"] {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
+.accordion__trigger[data-focus-visible="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0.75rem -0.75rem;
+  border: 1px solid currentColor;
+  pointer-events: none;
+}
+
+/* Answers open slowly, on the house curve. */
+@media (prefers-reduced-motion: no-preference) {
+  .accordion__panel {
+    transition:
+      height 0.55s var(--ease),
+      opacity 0.45s ease-out 0.08s;
+  }
+
+  .faq-mark::after {
+    transition: rotate 0.55s var(--ease);
+  }
+}
+
+/* ---------- Long-form text (legal pages) ---------- */
+
+.legal {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.legal > * + * {
+  margin-top: 1rem;
+}
+
+/* Rules run the full column; the text keeps a readable measure. */
+.legal > :not(h2) {
+  max-width: 40rem;
+}
+
+.legal > p:first-child {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+.legal h2 {
+  margin-top: 2.5rem;
+  border-top: 1px solid rgb(15 21 19 / 0.14);
+  padding-top: 2rem;
+  font-family: var(--font-cormorant, "Cormorant Garamond"), ui-serif, Georgia, serif;
+  font-size: 1.875rem;
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.012em;
+  font-variant-numeric: lining-nums;
+  color: var(--foreground);
+}
+
+.legal ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legal li {
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.legal li::before {
+  content: "\2014";
+  position: absolute;
+  left: 0;
+  color: #b08d57;
+}
+
+.legal strong {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.legal a {
+  padding-bottom: 0.125rem;
+  color: var(--foreground);
 }
 
 /* ---------- Motion ---------- */
 
-@media (prefers-reduced-motion: no-preference) {
+/* clip, not hidden: a hidden box becomes the scroller a child's view() timeline tracks. */
+.unveil,
+.enter-unveil {
+  overflow: clip;
+}
+
+/* The hover zoom is on transform, so it composes with the entrance animation on scale. */
+.zoomable {
+  transition: transform 1.6s var(--ease);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .group:hover .zoomable {
+    transform: scale(1.04);
+  }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
   @keyframes rise {
     from {
-      transform: translateY(90px);
+      translate: 0 1.5rem;
+    }
+  }
+  @keyframes settle {
+    from {
+      scale: 1.08;
     }
   }
   @keyframes drift {
+    to {
+      translate: 0 12%;
+    }
+  }
+  @keyframes unveil {
     from {
-      transform: translateX(-36px);
+      clip-path: inset(0 0 100% 0);
     }
     to {
-      transform: translateX(36px);
+      clip-path: inset(0);
     }
   }
-  @keyframes bob {
-    0%,
-    100% {
-      translate: 0 0;
-      rotate: -1.5deg;
-    }
-    50% {
-      translate: 0 3px;
-      rotate: 1.5deg;
-    }
-  }
-  @keyframes sway {
+  @keyframes zoom-out {
     from {
-      rotate: -1.2deg;
-    }
-    to {
-      rotate: 1.2deg;
+      scale: 1.14;
     }
   }
-  @keyframes fade-up {
+  @keyframes draw {
     from {
-      opacity: 0;
-      translate: 0 18px;
-    }
-  }
-  @keyframes fly-in {
-    from {
-      opacity: 0;
-      translate: -70px 36px;
-    }
-  }
-  @keyframes turn {
-    to {
-      rotate: 360deg;
+      background-size: 0 1px;
     }
   }
 
-  .art-sun {
-    animation: rise 2.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  }
-  .art-drift {
-    animation: drift 28s ease-in-out infinite alternate;
-  }
-  .art-drift-slow {
-    animation: drift 44s ease-in-out infinite alternate-reverse;
-  }
-  .art-bob,
-  .art-bob-late {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
-    animation: bob 6s ease-in-out infinite;
-  }
-  .art-bob-late {
-    animation-delay: -2.4s;
-  }
-  .art-plane {
-    animation: fly-in 2.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s both;
-  }
-  .art-sway {
-    transform-origin: 100% 0;
-    animation: sway 9s ease-in-out infinite alternate;
-  }
-  .art-turn {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: turn 120s linear infinite;
-  }
-
+  /* Load: the picture first, then the words one after another; opacity and movement on separate curves. */
   .enter {
-    animation: fade-up 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-    animation-delay: calc(var(--i, 0) * 110ms);
+    animation:
+      fade 1s ease-out both,
+      rise 1.6s var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 160ms + 350ms);
+  }
+
+  /* For an element that is already placed with a translate utility, which rise would overwrite. */
+  .enter-fade {
+    animation: fade 1.6s ease-out both;
+    animation-delay: calc(var(--i, 0) * 160ms + 350ms);
+  }
+
+  /*
+   * Load: what sits under a page's header waits for the title, whatever its own scroll reveals do.
+   * Plays once and fills backwards only, so nothing stays in effect and later reveals are untouched.
+   * Not for a section on ink: the paper would show through while it fades.
+   */
+  .after-title {
+    animation: fade 0.9s ease-out 0.55s backwards;
+  }
+
+  /* In the phone menu the lines follow the sheet in, closer together than a page's opening. */
+  .drawer__dialog .enter {
+    animation-duration: 0.6s, 1s;
+    animation-delay: calc(var(--i, 0) * 70ms + 200ms);
+  }
+
+  @keyframes line-rise {
+    from {
+      translate: 0 130%;
+    }
+  }
+
+  /* The hero headline rises line by line from behind its own baseline. Desktop only: below that it wraps freely and fades up. */
+  @media (min-width: 64rem) {
+    .lines.enter {
+      animation: none;
+    }
+
+    /* The padding gives descenders and italic overhang room inside the clip; the margin takes it back. */
+    .lines .line {
+      display: block;
+      overflow: hidden;
+      padding: 0 0.08em 0.26em;
+      margin: 0 -0.08em -0.26em;
+    }
+
+    .lines .line > span {
+      display: block;
+      animation: line-rise 1.5s var(--ease) both;
+      animation-delay: calc(var(--i, 0) * 160ms + 350ms);
+    }
+  }
+
+  .hero-photo {
+    animation: settle 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
+  .enter-unveil {
+    animation: unveil 1.5s var(--ease-draw) 0.5s both;
+  }
+
+  .enter-unveil img {
+    animation: zoom-out 2.4s var(--ease) 0.5s both;
   }
 
   @supports (animation-timeline: view()) {
-    .on-scroll {
-      animation: fade-up linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
+    /* The hero picture settles on load, then drifts slowly as the page scrolls away. */
+    .hero-photo {
+      animation:
+        settle 7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both,
+        drift linear both;
+      animation-timeline: auto, scroll(root);
+      animation-range:
+        normal,
+        0 100vh;
     }
+  }
+
+  /*
+   * Chromium 145 and later: each reveal plays once, in real time, when the element is a little way into the viewport.
+   * The trigger is listed once per animation, otherwise only the first one waits, and it stays below the
+   * animation shorthand. Keep a var() in each shorthand: the build's minifier otherwise moves the trigger above it.
+   */
+  @supports (timeline-trigger-name: --t) {
+    .on-scroll {
+      timeline-trigger: --reveal view(block 0% 12%) cover 0% cover 100%;
+      animation:
+        fade 1s ease-out both,
+        rise 1.6s var(--ease) both;
+      animation-delay: calc(var(--i, 0) * 120ms);
+      animation-trigger:
+        --reveal play-once,
+        --reveal play-once;
+    }
+
+    /* Pictures are unveiled from the top while easing back to rest. */
+    .unveil {
+      timeline-trigger: --unveil view(block 0% 18%) cover 0% cover 100%;
+      animation: unveil 1.5s var(--ease-draw) both;
+      animation-delay: calc(var(--i, 0) * 150ms);
+      animation-trigger: --unveil play-once;
+    }
+
+    .unveil img {
+      animation: zoom-out 2.4s var(--ease) both;
+      animation-delay: calc(var(--i, 0) * 150ms);
+      animation-trigger: --unveil play-once;
+    }
+
+    .rule {
+      timeline-trigger: --rule view(block 0% 8%) cover 0% cover 100%;
+      animation: draw 1.8s var(--ease-draw) both;
+      animation-trigger: --rule play-once;
+    }
+  }
+
+  /*
+   * Safari 26 and Chromium 115 to 144 have no trigger yet, so the same reveals follow the scroll position.
+   * The 1ms is a stand-in duration: a scroll timeline stretches it over the range, while zero would not play.
+   */
+  @supports (animation-timeline: view()) and (not (timeline-trigger-name: --t)) {
+    .on-scroll {
+      animation:
+        fade 1ms linear both,
+        rise 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 60px) entry calc(260px + var(--i, 0) * 60px);
+    }
+
+    .unveil {
+      view-timeline: --frame block;
+    }
+
+    .unveil img {
+      animation: zoom-out 1ms linear both;
+      animation-timeline: --frame;
+      animation-range: entry 0% cover 50%;
+    }
+
+    .rule {
+      animation: draw 1ms linear both;
+      animation-timeline: view();
+      animation-range: entry 0px entry 360px;
+    }
+  }
+
+  /* A reveal inside a reveal would move twice; the outer one carries it. */
+  .on-scroll .on-scroll {
+    animation: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .btn {
+    transition: none;
   }
 }

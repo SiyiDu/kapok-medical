@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { IconList } from "@/components/blocks";
-import { CtaPanel } from "@/components/sections";
-import { Spot } from "@/components/art/Spots";
-import { ButtonLink, PageHeader, Row, Section, TextLink } from "@/components/ui";
+import { LedgerList } from "@/components/blocks";
+import { CtaPanel, servicePhotos } from "@/components/sections";
+import { ButtonLink, Container, DisplayHeading, PageHeader, Row, Section, TextLink, withAmp } from "@/components/ui";
 import { getService, services } from "@/content/services";
 
 type Props = { params: Promise<{ slug: string }> };
+
+const two = (n: number) => String(n).padStart(2, "0");
 
 export const dynamicParams = false;
 
@@ -30,38 +32,67 @@ export default async function ServicePage({ params }: Props) {
   const service = getService(slug);
   if (!service) notFound();
 
+  const index = services.indexOf(service);
+  const next = services[(index + 1) % services.length];
+
   return (
     <>
       <PageHeader
         title={service.name}
         lead={service.intro}
-        art={<Spot name={service.icon} className="block aspect-[5/3] w-full" />}
+        photo={servicePhotos[service.icon]}
         kicker={
-          <TextLink href="/services" className="text-sm text-muted">
-            Services
-          </TextLink>
+          <p className="eyebrow flex items-baseline gap-3 text-stone">
+            <TextLink href="/services" size="inherit">
+              Services
+            </TextLink>
+            <span aria-hidden="true" className="h-px w-8 -translate-y-1 bg-bronze" />
+            <span className="tabular-nums">
+              {two(index + 1)} of {two(services.length)}
+            </span>
+          </p>
         }
       >
         <ButtonLink href="/contact">Start an Inquiry</ButtonLink>
       </PageHeader>
 
       <Section title="What We Do">
-        <IconList items={service.includes} icon="check" />
+        <LedgerList items={service.includes} numbered />
       </Section>
 
       <Section title="Not Covered">
-        <IconList items={service.notIncluded} icon="minus" />
+        <LedgerList items={service.notIncluded} />
       </Section>
 
       <Section title="Good to Know">
-        <div className="flex flex-col gap-8">
+        <div className="divide-y divide-line">
           {service.goodToKnow.map((item) => (
-            <Row key={item.title} title={item.title}>
-              {item.body}
-            </Row>
+            <div key={item.title} className="py-7 first:pt-0 last:pb-0">
+              <Row title={item.title}>{item.body}</Row>
+            </div>
           ))}
         </div>
       </Section>
+
+      {/* The four pages read as a series: the last leads back to the first. */}
+      <section>
+        <Container>
+          <div className="rule pt-10 pb-20 sm:pb-28">
+            <NextLink href={`/services/${next.slug}`} className="group on-scroll flex items-end justify-between gap-8">
+              <div className="flex flex-col gap-5">
+                <p className="eyebrow text-stone">Next service</p>
+                <DisplayHeading size="lg">{withAmp(next.name)}</DisplayHeading>
+              </div>
+              <span
+                aria-hidden="true"
+                className="pb-2 text-2xl transition-transform duration-700 motion-safe:group-hover:translate-x-2 sm:text-3xl"
+              >
+                →
+              </span>
+            </NextLink>
+          </div>
+        </Container>
+      </section>
 
       <CtaPanel />
     </>

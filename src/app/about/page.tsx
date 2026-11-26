@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CtaPanel } from "@/components/sections";
 import { PageHeader, Row, Section } from "@/components/ui";
+import { photos } from "@/content/photos";
 import { site } from "@/site.config";
 
 export const metadata: Metadata = {
@@ -20,11 +21,11 @@ const principles = [
   },
   {
     title: "Honest About Fit",
-    body: "If your situation is urgent, or better handled at home, we say so and we don't take the booking.",
+    body: "If your situation is urgent, or better handled at home, we say so and we don’t take the booking.",
   },
   {
     title: "Careful with Your Information",
-    body: "We ask only for what a booking needs, when it needs it. We don't sell it or use it for marketing.",
+    body: "We ask only for what a booking needs, when it needs it. We don’t sell it or use it for marketing.",
   },
 ];
 
@@ -33,22 +34,25 @@ export default function AboutPage() {
     <>
       <PageHeader
         title="About"
+        photo={photos.kapok}
         lead={`A small bilingual team in ${site.baseCity}. We help people from outside China use hospitals that are open to them but hard to reach from abroad.`}
       />
 
       <Section title="Why We Do This">
-        <div className="flex flex-col gap-4 text-muted">
-          <p>
-            Hospitals in {site.region} see patients quickly and are increasingly set up for international visitors.
+        <div className="flex flex-col gap-8">
+          <p className="max-w-[34rem] text-stone">
+            Hospitals in {site.regionProse} see patients quickly and are increasingly set up for international visitors.
             What stops most people is everything around the appointment: Chinese-language booking apps, a local phone
-            number, unfamiliar payment apps and signs they can&apos;t read.
+            number, unfamiliar payment apps and signs they can’t read.
           </p>
-          <p>None of that is medicine. All of it can be handled by someone local who speaks your language.</p>
+          <p className="display statement">
+            None of that is medicine. All of it can be handled by <em>someone local who speaks your language.</em>
+          </p>
         </div>
       </Section>
 
       <Section title="How We Work">
-        <div className="grid gap-8 sm:grid-cols-2">
+        <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2">
           {principles.map((p) => (
             <Row key={p.title} title={p.title}>
               {p.body}

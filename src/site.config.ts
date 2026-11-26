@@ -5,7 +5,6 @@
 
 type SiteConfig = {
   name: string;
-  descriptor: string;
   fullName: string;
   url: string;
   email: string;
@@ -13,7 +12,7 @@ type SiteConfig = {
   tiktok: string;
   baseCity: string;
   region: string;
-  regionLong: string;
+  regionProse: string;
   feeLabel: string;
   replyTime: string;
   formEndpoint: string;
@@ -25,7 +24,6 @@ type SiteConfig = {
 export const site: SiteConfig = {
   // PLACEHOLDER brand. Check the name and domain are free before using it.
   name: "Kapok",
-  descriptor: "Medical Concierge",
   fullName: "Kapok Medical Concierge",
 
   // The site's public address, no trailing slash. Used for canonical URLs, the sitemap and the share image.
@@ -45,10 +43,10 @@ export const site: SiteConfig = {
   // Full profile URL. Leave empty to hide.
   tiktok: "",
 
-  // Where the team is and where it works.
+  // Where the team is and where it works: `region` for labels and titles, `regionProse` inside a sentence.
   baseCity: "Shenzhen",
   region: "Shenzhen & Guangzhou",
-  regionLong: "Shenzhen, Guangzhou and the wider Greater Bay Area",
+  regionProse: "Shenzhen and Guangzhou",
 
   // Shown wherever the coordination fee is mentioned.
   feeLabel: "under US$100",
@@ -70,7 +68,7 @@ export const nav = [
   { href: "/services", label: "Services" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/hospitals", label: "Hospitals" },
-  { href: "/faq", label: "FAQ" },
+  { href: "/faq", label: "Questions" },
 ];
 
 export const footerNav = [...nav, { href: "/about", label: "About" }, { href: "/contact", label: "Contact" }];

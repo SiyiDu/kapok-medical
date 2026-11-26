@@ -1,18 +1,25 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { site } from "@/site.config";
 import { Container, DisplayHeading } from "./ui";
 
-/** Long-form legal text, set with HeroUI's prose styles at a comfortable measure. */
+/** Long-form legal text: the title holds the left third, the text runs down the content column. */
 export function LegalPage({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="pt-16 pb-16 sm:pt-24 sm:pb-24">
+    <section className="pt-16 pb-24 sm:pt-24 sm:pb-32">
       <Container>
-        <div className="flex max-w-2xl flex-col gap-4">
-          <DisplayHeading as="h1" size="lg">
-            {title}
-          </DisplayHeading>
-          <p className="text-sm text-muted">Last updated {site.lastUpdated}</p>
-          <div className="typography-prose mt-4 flex flex-col gap-4 text-muted [&_h2]:mt-6 [&_h2]:text-lg [&_h2]:font-medium [&_h2]:tracking-normal [&_h2]:text-foreground [&_ul]:my-0">
+        <div className="grid gap-x-12 gap-y-10 lg:grid-cols-12">
+          <div className="flex flex-col gap-5 lg:sticky lg:top-28 lg:col-span-4 lg:self-start">
+            <DisplayHeading as="h1" size="lg" className="enter">
+              {title}
+            </DisplayHeading>
+            <p className="enter eyebrow text-stone" style={{ "--i": 1 } as CSSProperties}>
+              Last updated {site.lastUpdated}
+            </p>
+          </div>
+          <div
+            className="enter legal min-w-0 lg:col-span-7 lg:col-start-6 lg:pt-1"
+            style={{ "--i": 2 } as CSSProperties}
+          >
             {children}
           </div>
         </div>

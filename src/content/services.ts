@@ -23,14 +23,14 @@ export const services: Service[] = [
       "Chinese hospitals take bookings through Chinese-language apps tied to a local phone number. We make the booking for you, in your name.",
     includes: [
       "A shortlist of suitable hospitals and departments",
-      "Booking in your name through the hospital's official channels",
+      "Booking in your name through the hospital’s official channels",
       "Written confirmation in English: date, time, building and what to bring",
       "Questions put to the hospital for you, such as languages, insurance and payment methods",
       "Rebooking help if your travel dates change",
     ],
     notIncluded: [
       "Medical advice, a diagnosis or a recommendation on treatment",
-      "The hospital's own charges, which you pay to the hospital directly",
+      "The hospital’s own charges, which you pay to the hospital directly",
       "A guarantee of a particular doctor or date, because availability is set by the hospital",
     ],
     goodToKnow: [
@@ -94,7 +94,7 @@ export const services: Service[] = [
     summary:
       "An English speaker with you, from registration to pharmacy.",
     intro:
-      "Large Chinese hospitals are fast, busy and signed in Chinese. A companion stays with you from registration to the pharmacy.",
+      "Large Chinese hospitals are fast, busy and signposted in Chinese. A companion stays with you from registration to the pharmacy.",
     includes: [
       "Meeting you at the hospital entrance or your hotel",
       "Help with registration, payment counters and finding each department",
@@ -114,11 +114,11 @@ export const services: Service[] = [
       },
       {
         title: "Quoted by the Half-Day",
-        body: "Companion time is quoted separately from the coordination fee, before your trip, so you know the cost in advance.",
+        body: "Companion time is quoted by the half-day, separately from the coordination fee and before you travel.",
       },
       {
         title: "Privacy",
-        body: "Companions don't keep copies of your reports. Anything you share with us is used only to arrange your visit.",
+        body: "Companions don’t keep copies of your reports. Anything you share with us is used only to arrange your visit.",
       },
     ],
     metaDescription:

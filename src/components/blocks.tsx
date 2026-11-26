@@ -1,86 +1,53 @@
-"use client";
+import { cx, Row } from "./ui";
 
-import { Check, ChevronDown, Minus, Xmark } from "@gravity-ui/icons";
-import { Accordion, Alert, Card } from "@heroui/react";
-import type { Faq } from "@/content/site-content";
+/** Small static blocks shared by the inner pages. Server-safe, like ui.tsx. */
 
-export function FaqAccordion({ items }: { items: Faq[] }) {
+/** A plain ruled list. Numbered in ink for what is included, a dash in stone for what is not. */
+export function LedgerList({ items, numbered = false }: { items: string[]; numbered?: boolean }) {
   return (
-    <Accordion className="w-full">
-      {items.map((item) => (
-        <Accordion.Item key={item.q} id={item.q}>
-          <Accordion.Heading>
-            <Accordion.Trigger>
-              {item.q}
-              <Accordion.Indicator>
-                <ChevronDown />
-              </Accordion.Indicator>
-            </Accordion.Trigger>
-          </Accordion.Heading>
-          <Accordion.Panel>
-            <Accordion.Body>{item.a}</Accordion.Body>
-          </Accordion.Panel>
-        </Accordion.Item>
+    <ul className="divide-y divide-line">
+      {items.map((item, i) => (
+        <li
+          key={item}
+          className={cx(
+            "grid grid-cols-[2rem_1fr] items-baseline gap-x-4 py-5 text-lg first:pt-0 last:pb-0 sm:grid-cols-[2.5rem_1fr] sm:gap-x-6",
+            numbered ? "text-ink" : "text-stone",
+          )}
+        >
+          <span aria-hidden="true" className="text-sm text-stone tabular-nums">
+            {numbered ? String(i + 1).padStart(2, "0") : "—"}
+          </span>
+          <span>{item}</span>
+        </li>
       ))}
-    </Accordion>
+    </ul>
   );
 }
 
-const listIcons = {
-  check: { Icon: Check, className: "text-success" },
-  cross: { Icon: Xmark, className: "text-muted" },
-  minus: { Icon: Minus, className: "text-muted" },
-} as const;
-
-export function IconList({
-  title,
-  items,
-  icon,
-}: {
-  title?: string;
-  items: string[];
-  icon: keyof typeof listIcons;
-}) {
-  const { Icon, className } = listIcons[icon];
+/**
+ * A named entry: a small label, the name in display serif, a note beneath. Mirrors the fee table.
+ * The label stands beside the name only where the column is wide enough to keep a long name to two lines.
+ */
+export function InfoRow({ title, subtitle, children }: { title: string; subtitle?: string; children: string }) {
   return (
-    <div className="flex flex-col gap-4">
-      {title ? <h3 className="font-medium">{title}</h3> : null}
-      <ul className="flex flex-col gap-3">
-        {items.map((item) => (
-          <li key={item} className="flex items-start gap-3 text-muted">
-            <Icon aria-hidden="true" className={`mt-1 size-4 shrink-0 ${className}`} />
-            {item}
-          </li>
-        ))}
-      </ul>
+    <div className="grid items-baseline gap-x-8 gap-y-2 py-7 first:pt-0 last:pb-0 sm:max-lg:grid-cols-[8rem_1fr] xl:grid-cols-[8rem_1fr]">
+      {subtitle ? <p className="eyebrow text-stone">{subtitle}</p> : null}
+      <div className="flex flex-col gap-3 sm:max-lg:col-start-2 xl:col-start-2">
+        <h3 className="display text-3xl leading-[1.06] tracking-[-0.012em] sm:text-4xl">{title}</h3>
+        <p className="max-w-md text-stone">{children}</p>
+      </div>
     </div>
   );
 }
 
-export function InfoCard({ title, subtitle, children }: { title: string; subtitle?: string; children: string }) {
+/** The emergency line on the contact page: a ruled note, set like the rows beside it. */
+export function EmergencyNote() {
   return (
-    <Card className="h-full p-6">
-      <Card.Header className="gap-1">
-        <Card.Title className="text-base">{title}</Card.Title>
-        {subtitle ? <Card.Description>{subtitle}</Card.Description> : null}
-      </Card.Header>
-      <Card.Content>
-        <p className="text-sm text-muted">{children}</p>
-      </Card.Content>
-    </Card>
-  );
-}
-
-export function EmergencyAlert() {
-  return (
-    <Alert status="danger">
-      <Alert.Indicator />
-      <Alert.Content>
-        <Alert.Title>In an Emergency</Alert.Title>
-        <Alert.Description>
-          Don&apos;t use this form. In mainland China call 120. Elsewhere, call your local emergency number.
-        </Alert.Description>
-      </Alert.Content>
-    </Alert>
+    <div role="note" className="border-t border-ink pt-6">
+      <Row title="In an Emergency" as="h2">
+        Don’t use this form. In mainland China, call <span className="text-ink tabular-nums">120</span>. Elsewhere,
+        call your local emergency number.
+      </Row>
+    </div>
   );
 }

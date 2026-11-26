@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { FaqAccordion } from "@/components/blocks";
+import { FaqAccordion } from "@/components/FaqAccordion";
 import { CtaPanel } from "@/components/sections";
-import { Container, PageHeader } from "@/components/ui";
-import { faqs } from "@/content/site-content";
+import { PageHeader, Section } from "@/components/ui";
+import { faqGroups, faqs } from "@/content/site-content";
 
 export const metadata: Metadata = {
-  title: "FAQ",
+  title: "Questions",
   description:
-    "Costs, payment, insurance, language, visas and what we can and can't do: answers for international patients planning care in China.",
+    "Costs, payment, insurance, language, visas and what we can and can’t do: answers for international patients planning care in China.",
   alternates: { canonical: "/faq/" },
 };
 
@@ -24,14 +24,12 @@ const faqJsonLd = {
 export default function FaqPage() {
   return (
     <>
-      <PageHeader title="Questions" lead="If yours isn't here, send it to us." />
-      <section className="pt-4 pb-12 sm:pb-16">
-        <Container>
-          <div className="max-w-3xl">
-            <FaqAccordion items={faqs} />
-          </div>
-        </Container>
-      </section>
+      <PageHeader title="Questions" lead="If yours isn’t here, send it to us." />
+      {faqGroups.map((group) => (
+        <Section key={group.title} title={group.title}>
+          <FaqAccordion items={group.items} />
+        </Section>
+      ))}
       <CtaPanel title="Still Have a Question?" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
     </>
